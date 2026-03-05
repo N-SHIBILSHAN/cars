@@ -3,6 +3,8 @@ import mongoose from "mongoose"
 import cors from "cors"
 import nodemailer from "nodemailer"
 import dotenv from "dotenv"
+import path from "path"
+import { fileURLToPath } from "url"
 
 import Enquiry from "./models/Enquiry.js"
 import vehicleRoutes from "./routes/VehicleRoutes.js"
@@ -12,27 +14,38 @@ dotenv.config()
 const app = express()
 
 /* ============================= */
-/* ✅ MIDDLEWARE */
+/* FIX __dirname for ES Modules */
 /* ============================= */
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+/* ============================= */
+/* MIDDLEWARE */
+/* ============================= */
+
 app.use(cors())
 app.use(express.json())
 
 /* ============================= */
-/* 🚗 VEHICLE ROUTES */
+/* VEHICLE ROUTES */
 /* ============================= */
+
 app.use("/api/vehicles", vehicleRoutes)
 
 /* ============================= */
-/* 🗄️ MongoDB CONNECT */
+/* MONGODB CONNECTION */
 /* ============================= */
+
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
+  .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.log(err))
 
 /* ============================= */
-/* 📧 MAIL TRANSPORTER */
+/* EMAIL TRANSPORTER */
 /* ============================= */
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -42,8 +55,9 @@ const transporter = nodemailer.createTransport({
 })
 
 /* ============================= */
-/* 📩 ENQUIRY ROUTE */
+/* ENQUIRY API */
 /* ============================= */
+
 app.post("/api/enquiry", async (req, res) => {
   try {
     const { name, email, phone, message, type } = req.body
@@ -77,8 +91,21 @@ app.post("/api/enquiry", async (req, res) => {
 })
 
 /* ============================= */
-/* 🚀 SERVER START */
+/* SERVE VITE FRONTEND */
 /* ============================= */
+
+app.use(express.static(path.join(__dirname, "../client/dist")))
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/dist/index.html"))
+})
+
+/* ============================= */
+/* SERVER START */
+/* ============================= */
+
 const PORT = process.env.PORT || 5000
 
-app.listen(PORT, () => console.log(`Server running on ${PORT}`))
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`)
+})
