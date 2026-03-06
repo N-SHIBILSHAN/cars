@@ -62,13 +62,7 @@ app.post("/api/enquiry", async (req, res) => {
   try {
     const { name, email, phone, message, type } = req.body
 
-    await Enquiry.create({
-      name,
-      email,
-      phone,
-      message,
-      type,
-    })
+    await Enquiry.create({ name, email, phone, message, type })
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
@@ -96,7 +90,7 @@ app.post("/api/enquiry", async (req, res) => {
 
 app.use(express.static(path.join(__dirname, "../client/dist")))
 
-app.get("*", (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist/index.html"))
 })
 
