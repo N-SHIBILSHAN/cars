@@ -28,6 +28,14 @@ app.use(cors())
 app.use(express.json())
 
 /* ============================= */
+/* HEALTH CHECK ROUTE */
+/* ============================= */
+
+app.get("/", (req, res) => {
+  res.send("🚀 Royal Cars API Running")
+})
+
+/* ============================= */
 /* VEHICLE ROUTES */
 /* ============================= */
 
@@ -37,10 +45,23 @@ app.use("/api/vehicles", vehicleRoutes)
 /* MONGODB CONNECTION */
 /* ============================= */
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.log(err))
+const connectDB = async () => {
+  try {
+    if (!process.env.MONGO_URI) {
+      console.error("❌ MONGO_URI missing in environment variables")
+      process.exit(1)
+    }
+
+    await mongoose.connect(process.env.MONGO_URI)
+
+    console.log("✅ MongoDB Connected")
+  } catch (error) {
+    console.error("❌ MongoDB connection error:", error.message)
+    process.exit(1)
+  }
+}
+
+connectDB()
 
 /* ============================= */
 /* EMAIL TRANSPORTER */
@@ -62,6 +83,10 @@ app.post("/api/enquiry", async (req, res) => {
   try {
     const { name, email, phone, message, type } = req.body
 
+    if (!name || !email || !message) {
+      return res.status(400).json({ error: "Missing required fields" })
+    }
+
     await Enquiry.create({ name, email, phone, message, type })
 
     await transporter.sendMail({
@@ -79,19 +104,21 @@ app.post("/api/enquiry", async (req, res) => {
 
     res.json({ success: true })
   } catch (err) {
-    console.log(err)
+    console.error(err)
     res.status(500).json({ error: "Server error" })
   }
 })
 
 /* ============================= */
-/* SERVE VITE FRONTEND */
+/* SERVE FRONTEND (VITE BUILD) */
 /* ============================= */
 
-app.use(express.static(path.join(__dirname, "../client/dist")))
+const clientPath = path.join(__dirname, "../client/dist")
 
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist/index.html"))
+app.use(express.static(clientPath))
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientPath, "index.html"))
 })
 
 /* ============================= */
