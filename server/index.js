@@ -28,10 +28,10 @@ app.use(cors())
 app.use(express.json())
 
 /* ============================= */
-/* HEALTH CHECK ROUTE */
+/* API HEALTH CHECK */
 /* ============================= */
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.send("🚀 Royal Cars API Running")
 })
 
@@ -117,7 +117,8 @@ const clientPath = path.join(__dirname, "../client/dist")
 
 app.use(express.static(clientPath))
 
-app.get("*", (req, res) => {
+// React fallback route
+app.use((req, res) => {
   res.sendFile(path.join(clientPath, "index.html"))
 })
 
@@ -125,7 +126,7 @@ app.get("*", (req, res) => {
 /* SERVER START */
 /* ============================= */
 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 10000
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`)
