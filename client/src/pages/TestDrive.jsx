@@ -14,18 +14,37 @@ export default function TestDrive() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    await fetch("http://localhost:5000/api/enquiry", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...form,
-        type: "test-drive",
-      }),
-    })
+    try {
+      const res = await fetch(
+        "https://cars-ex3y.onrender.com/api/enquiry",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...form,
+            type: "test-drive",
+          }),
+        }
+      )
 
-    alert("Test drive booked 🚀")
+      if (res.ok) {
+        alert("Test drive booked 🚀")
+        setForm({
+          name: "",
+          email: "",
+          phone: "",
+          message: "",
+        })
+      } else {
+        alert("Failed to book test drive")
+      }
+
+    } catch (error) {
+      console.error(error)
+      alert("Server error")
+    }
   }
 
   return (
@@ -33,13 +52,46 @@ export default function TestDrive() {
       <h1 className="text-3xl font-bold mb-6">Schedule Test Drive</h1>
 
       <form onSubmit={handleSubmit} className="max-w-md space-y-4">
-        <input name="name" placeholder="Name" onChange={handleChange} className="w-full p-3 border rounded" />
-        <input name="email" placeholder="Email" onChange={handleChange} className="w-full p-3 border rounded" />
-        <input name="phone" placeholder="Phone" onChange={handleChange} className="w-full p-3 border rounded" />
-        <textarea name="message" placeholder="Preferred car & date" onChange={handleChange} className="w-full p-3 border rounded" />
+
+        <input
+          name="name"
+          placeholder="Name"
+          value={form.name}
+          onChange={handleChange}
+          className="w-full p-3 border rounded"
+          required
+        />
+
+        <input
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          className="w-full p-3 border rounded"
+          required
+        />
+
+        <input
+          name="phone"
+          placeholder="Phone"
+          value={form.phone}
+          onChange={handleChange}
+          className="w-full p-3 border rounded"
+          required
+        />
+
+        <textarea
+          name="message"
+          placeholder="Preferred car & date"
+          value={form.message}
+          onChange={handleChange}
+          className="w-full p-3 border rounded"
+        />
+
         <button className="w-full bg-black text-white py-3 rounded">
           Book Test Drive
         </button>
+
       </form>
     </section>
   )
