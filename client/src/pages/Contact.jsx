@@ -1,6 +1,7 @@
 import { useState } from "react"
 
 export default function Contact() {
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -21,21 +22,33 @@ export default function Contact() {
     setSuccess(false)
 
     try {
-      const res = await fetch("http://localhost:5000/api/enquiry", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...form,
-          type: "contact",
-        }),
-      })
+
+      const res = await fetch(
+        "https://cars-ex3y.onrender.com/api/enquiry",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...form,
+            type: "contact",
+          }),
+        }
+      )
 
       if (res.ok) {
         setSuccess(true)
-        setForm({ name: "", email: "", phone: "", message: "" })
+        setForm({
+          name: "",
+          email: "",
+          phone: "",
+          message: "",
+        })
+      } else {
+        alert("Failed to send enquiry ❌")
       }
+
     } catch (err) {
       console.error(err)
       alert("Something went wrong ❌")
@@ -47,7 +60,9 @@ export default function Contact() {
   return (
     <>
       <section className="pt-28 pb-16 px-6 md:px-16 bg-white min-h-screen">
+
         <div className="max-w-5xl mx-auto">
+
           <h1 className="text-4xl font-bold mb-4 text-gray-900">
             Contact Royal Cars
           </h1>
@@ -58,28 +73,32 @@ export default function Contact() {
           </p>
 
           <div className="grid md:grid-cols-2 gap-10">
+
             {/* LEFT INFO */}
             <div>
+
               <h3 className="text-xl font-semibold mb-4">📍 Showroom</h3>
               <p className="text-gray-600 mb-4">
                 Royal Cars, Palakkad, Kerala, India
               </p>
 
               <h3 className="text-xl font-semibold mb-4">📞 Phone</h3>
-              <p className="text-gray-600 mb-4">+91 98765 43210</p>
+              <p className="text-gray-600 mb-4">
+                +91 98765 43210
+              </p>
 
               <h3 className="text-xl font-semibold mb-4">✉️ Email</h3>
               <p className="text-gray-600 mb-6">
                 sales@royalcars.com
               </p>
 
-              {/* Google Map */}
               <iframe
                 src="https://www.google.com/maps?q=Palakkad,Kerala&output=embed"
                 className="w-full h-[260px] rounded-2xl border"
                 loading="lazy"
                 title="map"
               />
+
             </div>
 
             {/* RIGHT FORM */}
@@ -87,6 +106,7 @@ export default function Contact() {
               onSubmit={handleSubmit}
               className="bg-gray-50 p-6 rounded-2xl shadow-md"
             >
+
               {success && (
                 <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm">
                   ✅ Enquiry sent successfully!
@@ -140,9 +160,13 @@ export default function Contact() {
               >
                 {loading ? "Sending..." : "Send Enquiry"}
               </button>
+
             </form>
+
           </div>
+
         </div>
+
       </section>
 
       {/* WhatsApp Floating Button */}
